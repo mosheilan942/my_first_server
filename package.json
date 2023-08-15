@@ -1,0 +1,16 @@
+{
+  "type": "module",
+  "name": "express-sassion",
+  "version": "1.0.0",
+  "description": "my first use of express",
+  "main": "javascript.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "new_script": "node app.js"
+  },
+  "author": "moshe ilan",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
