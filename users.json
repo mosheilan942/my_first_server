@@ -1,0 +1,19 @@
+{
+    "users": [
+        {
+            "id": "2",
+            "email": "dod",
+            "password": "000"
+        },
+        {
+            "id": "3",
+            "email": "mom",
+            "password": "789"
+        },
+        {
+            "id": "d5f56d4b-ca43-4cbf-99da-3d8585301894",
+            "email": "moisi6510@gmail.com",
+            "password": "$2b$10$TXs2bZMx89KTWzNcLvab3OJR/k.efxbVW6TkvAZOZAD8LAO55.BU6"
+        }
+    ]
+}
