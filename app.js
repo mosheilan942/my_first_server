@@ -1,10 +1,9 @@
-// const express = require('express')
-// import * as arr from './users.json'
+import * as jsonfileService from "./jsonfileService.js"
 import * as moshe from "express";
 import json from "jsonfile";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
-// const bcrypt = require('bcrypt');
+
 const saltRounds = 10;
 let myPlaintextPassword = "mosheilan";
 const someOtherPlaintextPassword = "not_bacon";
@@ -14,24 +13,23 @@ const port = 3000;
 
 app.use(moshe.json());
 
-async function main() {}
+async function main() {
 
-app.get("/all-user", (req, res) => {
-  json.readFile("./users.json", function (err, obj) {
-    if (err) console.error(err);
+await app.get("/all-user", async (req, res) => {
+    const obj = await jsonfileService.read("./users.json");
     res.send(obj);
   });
-});
+}
 
-app.get("/all-user/:id", (req, res) => {
-  json.readFile("./users.json", function (err, obj) {
-    if (err) console.error(err);
-    let index = obj.users.findIndex((e) => e.id === req.params.id);
+
+
+await app.get("/all-user/:id", async (req, res) => {
+  const obj = await jsonfileService.read("./users.json");
+  let index = obj.users.findIndex((e) => e.id === req.params.id);
     index != -1 ? res.send(obj.users[index]) : null;
-  });
 });
 
-app.post("/crate-user", (req, res) => {
+await app.post("/crate-user", (req, res) => {
   let myPlaintextPassword = req.body.password;
   let obj_user = {
     id: uuidv4(),
@@ -43,22 +41,18 @@ app.post("/crate-user", (req, res) => {
   const reg = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
   reg.test(req.body.email) ? (velid_email = true) : null;
   if (velid_email) {
-    const regpass = new RegExp(
-      /^(?=[a-zA-Z]*[a-z])(?=[a-zA-Z]*[A-Z])[a-zA-Z]{8}$/
-    );
+    const regpass = new RegExp(/^(?=[a-zA-Z]*[a-z])(?=[a-zA-Z]*[A-Z])[a-zA-Z0-9]{8}$/);
     regpass.test(req.body.password) ? (velid_password = true) : null;
     if (velid_password) {
-      Bcrypt.hash(myPlaintextPassword, saltRounds, function (err, hash) {
+      console.log("esfsf");
+      Bcrypt.hash(myPlaintextPassword, saltRounds, async function (err, hash) {
         obj_user.password = hash;
-        json.readFile("./users.json", function (err, obj) {
-          if (err) console.error(err);
-          const arr = obj.users;
-          arr.push(obj_user);
-          res.send(arr);
-          json.writeFile("users.json", obj, function (err) {
-            if (err) console.error(err);
-          });
-        });
+        console.log("fewfee");
+        const obj = await jsonfileService.read("./users.json");
+        const arr = obj.users;
+        arr.push(obj_user);
+        res.send(arr);
+        const obj_update = await jsonfileService.write("./users.json", obj);
       });
     }
   }
@@ -159,3 +153,4 @@ async function addProduct(url, id) {
 }
 
 
+main()
