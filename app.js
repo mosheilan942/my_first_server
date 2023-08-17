@@ -3,6 +3,10 @@ import * as moshe from "express";
 import json from "jsonfile";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
+import {printParams, checkvalid} from "./my-middleware.js";
+
+
+
 
 const saltRounds = 10;
 let myPlaintextPassword = "mosheilan";
@@ -18,56 +22,35 @@ async function main() {
 await app.get("/all-user", async (req, res) => {
     const obj = await jsonfileService.read("./users.json");
     res.send(obj);
+    
   });
 }
 
 
-
 await app.get("/all-user/:id", async (req, res) => {
-  const obj = await jsonfileService.read("./users.json");
-  let index = obj.users.findIndex((e) => e.id === req.params.id);
-    index != -1 ? res.send(obj.users[index]) : null;
+  const obj = await jsonfileService.readUserByid("./users.json", req.params.id);
+  res.send(obj);
 });
 
-await app.post("/crate-user", (req, res) => {
-  let myPlaintextPassword = req.body.password;
-  let obj_user = {
-    id: uuidv4(),
-    email: req.body.email,
-    password: req.body.password,
-  };
-  let velid_email = false;
-  let velid_password = false;
-  const reg = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
-  reg.test(req.body.email) ? (velid_email = true) : null;
-  if (velid_email) {
-    const regpass = new RegExp(/^(?=[a-zA-Z]*[a-z])(?=[a-zA-Z]*[A-Z])[a-zA-Z0-9]{8}$/);
-    regpass.test(req.body.password) ? (velid_password = true) : null;
-    if (velid_password) {
-      console.log("esfsf");
-      Bcrypt.hash(myPlaintextPassword, saltRounds, async function (err, hash) {
-        obj_user.password = hash;
-        console.log("fewfee");
-        const obj = await jsonfileService.read("./users.json");
-        const arr = obj.users;
-        arr.push(obj_user);
-        res.send(arr);
-        const obj_update = await jsonfileService.write("./users.json", obj);
-      });
-    }
-  }
+
+await app.post("/crate-user", checkvalid, async(req, res) => {
+  const obj = await jsonfileService.crateNewUser("./users.json", req.body);
+  res.send(obj);
 });
 
-app.put("/all-user/:id", (req, res) => {
-  json.readFile("./users.json", function (err, obj) {
-    let email = req.body.email;
+
+await app.put("/all-user/:id", async (req, res) => {
+  json.readFile("./users.json", async function (err, obj) {
+    let email = await req.body.email;
+    console.log(email);
     let password = req.body.password;
     if (err) console.error(err);
     let myPlaintextPassword = password;
     let velid_email = false;
     let velid_password = false;
-    const reg = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
-    reg.test(email) ? (velid_email = true) : null;
+    // const reg = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
+    // reg.test(email) ? (velid_email = true) : null;
+
     if (velid_email) {
       const regpass = new RegExp(
         /^(?=[a-zA-Z]*[a-z])(?=[a-zA-Z]*[A-Z])[a-zA-Z]{8}$/
@@ -154,3 +137,9 @@ async function addProduct(url, id) {
 
 
 main()
+
+
+
+
+
+
